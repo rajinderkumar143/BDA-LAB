@@ -1,0 +1,76 @@
+CREATE DATABASE healthcare_db;
+USE healthcare_db;
+CREATE TABLE patients (
+patient_id INT PRIMARY KEY AUTO_INCREMENT,
+full_name VARCHAR(100),
+gender VARCHAR(10),
+date_of_birth DATE,
+phone VARCHAR(15),
+email VARCHAR(100),
+address TEXT,
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE lab_reports (
+report_id INT PRIMARY KEY AUTO_INCREMENT,
+patient_id INT,
+test_name VARCHAR(100),
+test_result VARCHAR(100),
+normal_range VARCHAR(50),
+test_date DATE,
+doctor_name VARCHAR(100),
+FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
+);
+
+CREATE TABLE medical_images (
+image_id INT PRIMARY KEY AUTO_INCREMENT,
+patient_id INT,
+image_type VARCHAR(50),
+body_part VARCHAR(50),
+diagnosis VARCHAR(100),
+image_url VARCHAR(255),
+uploaded_by VARCHAR(100),
+uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY (patient_id) REFERENCES patients(patient_id)
+);
+
+INSERT INTO patients (full_name, gender, date_of_birth, phone, email, address)
+VALUES ('Rohan Sharma', 'Male', '1995-06-15', '9876543210', 'rohan@gmail.com', 'Bangalore');
+INSERT INTO lab_reports (patient_id, test_name, test_result, normal_range, test_date, doctor_name)
+VALUES (1, 'Blood Sugar', '110 mg/dL', '70-140 mg/dL', '2026-01-30', 'Dr. Mehta');
+INSERT INTO medical_images (patient_id, image_type, body_part, diagnosis, image_url, uploaded_by)
+VALUES (1, 'MRI', 'Brain', 'Tumor','https://cloud/mri_brain_001.jpg', 'Dr. Rao');
+
+SELECT * FROM patients;
+SELECT * FROM patients WHERE patient_id = 1;
+SELECT * FROM lab_reports;
+SELECT * FROM lab_reports WHERE patient_id = 1;
+SELECT * FROM medical_images WHERE patient_id = 1;
+
+SELECT p.full_name, l.test_name, l.test_result, m.image_type, m.diagnosis
+FROM patients p
+LEFT JOIN lab_reports l ON p.patient_id = l.patient_id
+LEFT JOIN medical_images m ON p.patient_id = m.patient_id;
+
+
+SELECT COUNT(*) AS total_patients FROM patients;
+SELECT COUNT(*) AS total_lab_reports FROM lab_reports;
+
+SELECT patient_id, COUNT(*) AS total_tests
+FROM lab_reports
+GROUP BY patient_id;
+
+SELECT image_type, COUNT(*) AS total_images
+FROM medical_images
+GROUP BY image_type;
+
+UPDATE patients SET address = 'Hyderabad' WHERE patient_id = 1;
+UPDATE patients SET phone = '9999999999' WHERE patient_id = 1;
+UPDATE lab_reports SET test_result = '95 mg/dL' WHERE report_id = 1;
+UPDATE medical_images SET diagnosis = 'Benign Tumor' WHERE image_id = 1;
+
+DELETE FROM lab_reports WHERE report_id = 1;
+DELETE FROM lab_reports WHERE patient_id = 1;
+DELETE FROM medical_images WHERE image_id = 1;
+DELETE FROM patients WHERE patient_id = 1;
+
